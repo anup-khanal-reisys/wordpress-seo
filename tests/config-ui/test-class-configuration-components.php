@@ -1,40 +1,7 @@
 <?php
 /**
- * @package WPSEO\UnitTests
+ * @package WPSEO\Tests\ConfigUI
  */
-
-/**
- * Class WPSEO_Configuration_Components_Mock
- */
-class WPSEO_Configuration_Components_Mock extends WPSEO_Configuration_Components {
-
-	/**
-	 * WPSEO_Configuration_Components_Mock constructor.
-	 *
-	 * Removes default registrations
-	 */
-	public function __construct() {
-	}
-
-	/**
-	 * Retrieve all components
-	 *
-	 * @return array
-	 */
-	public function get_components() {
-		return $this->components;
-	}
-
-	/**
-	 * Get the current adapter
-	 *
-	 * @return WPSEO_Configuration_Options_Adapter
-	 */
-	public function get_adapter() {
-		return $this->adapter;
-	}
-}
-
 
 /**
  * Class WPSEO_Configuration_Components_Tests
@@ -43,6 +10,15 @@ class WPSEO_Configuration_Components_Tests extends PHPUnit_Framework_TestCase {
 
 	/** @var WPSEO_Configuration_Components_Mock */
 	protected $components;
+
+	/**
+	 * Include helper class.
+	 */
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+
+		require_once WPSEO_TESTS_PATH . 'doubles/wpseo-configuration-components-mock.php';
+	}
 
 	/**
 	 * Set up
@@ -54,14 +30,14 @@ class WPSEO_Configuration_Components_Tests extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers WPSEO_Configuration_Components::__construct()
+	 * @covers WPSEO_Configuration_Components::initialize()
 	 */
 	public function test_constructor() {
 		$components = new WPSEO_Configuration_Components_Mock();
 		$components->initialize();
-		$list       = $components->get_components();
 
-		$this->assertEquals( 2, count( $list ) );
+		$list = $components->get_components();
+		$this->assertEquals( 4, count( $list ) );
 	}
 
 	/**

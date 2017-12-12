@@ -1,23 +1,7 @@
 <?php
 /**
- * @package WPSEO\UnitTests
+ * @package WPSEO\Tests\ConfigUI
  */
-
-/**
- * Class WPSEO_Configuration_Structure_Mock
- */
-class WPSEO_Configuration_Structure_Mock extends WPSEO_Configuration_Structure {
-	/**
-	 * Make add_step public
-	 *
-	 * @param string $identifier
-	 * @param string $title
-	 * @param array  $fields
-	 */
-	public function add_step( $identifier, $title, $fields ) {
-		return parent::add_step( $identifier, $title, $fields );
-	}
-}
 
 /**
  * Class WPSEO_Configuration_Structure_Test
@@ -26,6 +10,15 @@ class WPSEO_Configuration_Structure_Test extends PHPUnit_Framework_TestCase {
 
 	/** @var WPSEO_Configuration_Service_Mock Mock holder */
 	protected $structure;
+
+	/**
+	 * Include helper class.
+	 */
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+
+		require_once WPSEO_TESTS_PATH . 'doubles/wpseo-configuration-structure-mock.php';
+	}
 
 	/**
 	 * Set up
@@ -37,9 +30,11 @@ class WPSEO_Configuration_Structure_Test extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers WPSEO_Configuration_Structure::__construct()
+	 * @covers WPSEO_Configuration_Structure::initialize()
 	 */
 	public function test_constructor() {
+		$this->structure->initialize();
+
 		$steps = $this->structure->retrieve();
 
 		$expected = array(
@@ -52,6 +47,8 @@ class WPSEO_Configuration_Structure_Test extends PHPUnit_Framework_TestCase {
 			'multipleAuthors',
 			'connectGoogleSearchConsole',
 			'titleTemplate',
+			'newsletter',
+			'suggestions',
 			'success',
 		);
 
@@ -62,7 +59,12 @@ class WPSEO_Configuration_Structure_Test extends PHPUnit_Framework_TestCase {
 	 * @covers WPSEO_Configuration_Structure::add_step()
 	 */
 	public function test_add_step() {
-		$this->assertNull( $this->structure->add_step( 'i', 't', 'f' ) );
+
+		$this->structure->add_step_mock( 'i', 't', 'f' );
+
+		$steps = $this->structure->retrieve();
+
+		$this->assertTrue( ! empty( $steps['i'] ) );
 	}
 
 	/**
@@ -73,13 +75,18 @@ class WPSEO_Configuration_Structure_Test extends PHPUnit_Framework_TestCase {
 		$title      = 't';
 		$fields     = 'f';
 
-		$this->structure->add_step( $identifier, $title, $fields );
+		$this->structure->add_step_mock( $identifier, $title, $fields );
 
 		$steps = $this->structure->retrieve();
 
 		$this->assertTrue( isset( $steps[ $identifier ] ) );
 		$this->assertEquals(
-			array( 'title' => $title, 'fields' => $fields ),
+			array(
+				'title'          => $title,
+				'fields'         => $fields,
+				'hideNavigation' => false,
+				'fullWidth'      => false,
+			),
 			$steps[ $identifier ]
 		);
 	}

@@ -1,25 +1,7 @@
 <?php
 /**
- * @package WPSEO\Unittests
+ * @package WPSEO\Tests\ConfigUI
  */
-
-/**
- * Class WPSEO_Configuration_Service_Mock
- */
-class WPSEO_Configuration_Service_Mock extends WPSEO_Configuration_Service {
-	/**
-	 * @param string $item Property to get.
-	 *
-	 * @return null|mixed
-	 */
-	public function get( $item ) {
-		if ( isset( $this->{$item} ) ) {
-			return $this->{$item};
-		}
-
-		return null;
-	}
-}
 
 /**
  * Class WPSEO_Configuration_Service_Test
@@ -28,6 +10,15 @@ class WPSEO_Configuration_Service_Test extends PHPUnit_Framework_TestCase {
 
 	/** @var WPSEO_Configuration_Service instance */
 	protected $configuration_service;
+
+	/**
+	 * Include helper class.
+	 */
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+
+		require_once WPSEO_TESTS_PATH . 'doubles/wpseo-configuration-service-mock.php';
+	}
 
 	/**
 	 * Preparation
@@ -52,16 +43,9 @@ class WPSEO_Configuration_Service_Test extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Make sure the REST API init is hooked on
-	 *
-	 * @covers WPSEO_Configuration_Service::register_hooks()
 	 */
 	public function test_rest_api_init_hooked() {
-		$this->configuration_service->register_hooks();
-
-		$this->assertEquals( 10, has_action( 'rest_api_init', array(
-			$this->configuration_service,
-			'initialize',
-		) ) );
+		$this->assertEquals( 10, has_action( 'rest_api_init', 'wpseo_init_rest_api' ) );
 	}
 
 	/**
@@ -130,24 +114,6 @@ class WPSEO_Configuration_Service_Test extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers WPSEO_Configuration_Service::initialize()
-	 */
-	public function test_initialize_functions() {
-		$endpoint = $this
-			->getMockBuilder( 'WPSEO_Configuration_Endpoint' )
-			->setMethods( array( 'register' ) )
-			->getMock();
-
-		$endpoint
-			->expects( $this->once() )
-			->method( 'register' );
-
-		$this->configuration_service->set_endpoint( $endpoint );
-		$this->configuration_service->initialize();
-
-	}
-
-	/**
 	 * Test retrieving configuration
 	 *
 	 * @covers WPSEO_Configuration_Service::get_configuration()
@@ -155,7 +121,7 @@ class WPSEO_Configuration_Service_Test extends PHPUnit_Framework_TestCase {
 	public function test_get_configuration() {
 		$storage   = $this->getMockBuilder( 'WPSEO_Configuration_Storage' )->setMethods( array( 'retrieve' ) )->getMock();
 		$structure = $this->getMockBuilder( 'WPSEO_Configuration_Structure' )->setMethods( array( 'retrieve' ) )->getMock();
-		$adapter = new WPSEO_Configuration_Options_Adapter();
+		$adapter   = new WPSEO_Configuration_Options_Adapter();
 
 		$storage
 			->expects( $this->once() )
@@ -171,6 +137,7 @@ class WPSEO_Configuration_Service_Test extends PHPUnit_Framework_TestCase {
 		$this->configuration_service->set_options_adapter( $adapter );
 		$this->configuration_service->set_structure( $structure );
 		$this->configuration_service->set_components( new WPSEO_Configuration_Components() );
+		$this->configuration_service->set_translations( new WPSEO_Configuration_Translations( 'en_US' ) );
 
 		$result = $this->configuration_service->get_configuration();
 
@@ -178,8 +145,9 @@ class WPSEO_Configuration_Service_Test extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(
 			array(
-				'fields' => array(),
-				'steps'  => array(),
+				'fields'       => array(),
+				'steps'        => array(),
+				'translations' => array(),
 			),
 			$result
 		);
@@ -216,6 +184,7 @@ class WPSEO_Configuration_Service_Test extends PHPUnit_Framework_TestCase {
 		$this->configuration_service->set_storage( $storage );
 		$this->configuration_service->set_options_adapter( new WPSEO_Configuration_Options_Adapter() );
 		$this->configuration_service->set_components( new WPSEO_Configuration_Components() );
+		$this->configuration_service->set_structure( new WPSEO_Configuration_Structure() );
 		$this->configuration_service->set_configuration( $data );
 	}
 

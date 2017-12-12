@@ -1,10 +1,9 @@
 /* browser:true */
 /* global tb_show, wpseoSelect2Locale */
 
-import initializeAlgoliaSearch from "./kb-search/wp-seo-kb-search-init";
-
 ( function( $ ) {
-	window.wpseo_init_tabs = function() {
+	// eslint-disable-next-line
+	function wpseoInitTabs() {
 		if ( jQuery( ".wpseo-metabox-tabs-div" ).length > 0 ) {
 			jQuery( ".wpseo-metabox-tabs" )
 				.on( "click", "a.wpseo_tablink", function( ev ) {
@@ -44,6 +43,10 @@ import initializeAlgoliaSearch from "./kb-search/wp-seo-kb-search-init";
 
 			jQuery( "a.wpseo-meta-section-link" )
 				.on( "click", function( ev ) {
+					var targetTab = jQuery( this ).attr( "href" ),
+						targetTabElement = jQuery( targetTab ),
+						helpCenterToggleButton = jQuery( ".yoast-help-center__button" );
+
 					ev.preventDefault();
 
 					jQuery( ".wpseo-metabox-sidebar li" ).removeClass( "active" );
@@ -52,8 +55,14 @@ import initializeAlgoliaSearch from "./kb-search/wp-seo-kb-search-init";
 					// Hide the Yoast tooltip when the element gets clicked.
 					jQuery( this ).addClass( "yoast-tooltip-hidden" );
 
-					var targetElem = jQuery( jQuery( this ).attr( "href" ) );
-					targetElem.addClass( "active" );
+					targetTabElement.addClass( "active" );
+
+					// Close the Help Center when clicking on the Go Premium link.
+					if ( targetTab === "#wpseo-meta-section-premium" ) {
+						if ( helpCenterToggleButton.attr( "aria-expanded" ) === "true" ) {
+							helpCenterToggleButton.click();
+						}
+					}
 
 					jQuery( this ).parent( "li" ).addClass( "active" );
 				} )
@@ -67,12 +76,13 @@ import initializeAlgoliaSearch from "./kb-search/wp-seo-kb-search-init";
 				} );
 		}
 
-		jQuery( ".wpseo-heading" ).hide();
 		jQuery( ".wpseo-metabox-tabs" ).show();
 		// End Tabs code.
 
-		initializeAlgoliaSearch();
-	};
+	}
+
+	window.wpseoInitTabs = wpseoInitTabs;
+	window.wpseo_init_tabs = wpseoInitTabs;
 
 	/**
 	 * @summary Adds select2 for selected fields.
@@ -103,7 +113,7 @@ import initializeAlgoliaSearch from "./kb-search/wp-seo-kb-search-init";
 		$closeButton = $( "#TB_closeWindowButton" );
 
 		// The container window isn't the correct size, rectify this and also the centering.
-		$popupWindow.css( { width: 680, height: 235, "margin-left": -340 } );
+		$popupWindow.css( { width: 680, height: 350, "margin-left": -340 } );
 
 		// Accessibility improvements.
 		$popupWindow
@@ -162,10 +172,8 @@ import initializeAlgoliaSearch from "./kb-search/wp-seo-kb-search-init";
 		);
 
 		var snippetHelp = jQuery( "#help-yoast-snippetpreview" ).detach().removeClass( "wpseo_hidden" );
-		// Post/media meta box.
+		// Post/taxonomy/media meta box.
 		jQuery( "#wpseosnippet" ).find( "h3" ).after( snippetHelp );
-		// Taxonomy meta box.
-		jQuery( "#wpseo_snippet" ).find( "h3" ).after( snippetHelp );
 	}
 
 	jQuery( document ).ready( function() {

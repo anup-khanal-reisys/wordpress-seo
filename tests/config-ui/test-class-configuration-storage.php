@@ -1,24 +1,7 @@
 <?php
 /**
- * @package WPSEO\UnitTests
+ * @package WPSEO\Tests\ConfigUI
  */
-
-/**
- * Class WPSEO_Configuration_Storage_Mock
- */
-class WPSEO_Configuration_Storage_Mock extends WPSEO_Configuration_Storage {
-	public function get_fields() {
-		return $this->fields;
-	}
-
-	public function is_not_null( $input ) {
-		return parent::is_not_null( $input );
-	}
-
-	public function get_field_data( WPSEO_Config_Field $field ) {
-		return parent::get_field_data( $field );
-	}
-}
 
 /**
  * Class WPSEO_Configuration_Storage_Test
@@ -26,6 +9,15 @@ class WPSEO_Configuration_Storage_Mock extends WPSEO_Configuration_Storage {
 class WPSEO_Configuration_Storage_Test extends PHPUnit_Framework_TestCase {
 	/** @var WPSEO_Configuration_Storage_Mock */
 	protected $storage;
+
+	/**
+	 * Include helper class.
+	 */
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+
+		require_once WPSEO_TESTS_PATH . 'doubles/wpseo-configuration-storage-mock.php';
+	}
 
 	/**
 	 * Set up
@@ -169,7 +161,10 @@ class WPSEO_Configuration_Storage_Test extends PHPUnit_Framework_TestCase {
 	 */
 	public function test_get_field_data_array() {
 		$data    = array( 'a' => '1' );
-		$default = array( 'a' => '2', 'b' => '2' );
+		$default = array(
+			'a' => '2',
+			'b' => '2',
+		);
 
 		$adapter = $this
 			->getMockBuilder( 'WPSEO_Configuration_Options_Adapter' )
@@ -195,7 +190,10 @@ class WPSEO_Configuration_Storage_Test extends PHPUnit_Framework_TestCase {
 		$this->storage->set_adapter( $adapter );
 
 		$this->assertEquals(
-			array( 'a' => '1', 'b' => '2' ),
+			array(
+				'a' => '1',
+				'b' => '2',
+			),
 			$this->storage->get_field_data( $field )
 		);
 	}
@@ -212,11 +210,11 @@ class WPSEO_Configuration_Storage_Test extends PHPUnit_Framework_TestCase {
 
 		$expected = array(
 			$field => array(
-				'componentName'  => $component,
-				'properties' => array(
+				'componentName' => $component,
+				'properties'    => array(
 					$property => $property_value,
 				),
-				'data'       => $data,
+				'data'          => $data,
 			),
 		);
 

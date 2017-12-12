@@ -1,14 +1,7 @@
 <?php
-
 /**
- * Exposes protected defaults from WPSEO_Option_XML class
+ * @package WPSEO\Tests\Sitemaps
  */
-class WPSEO_Option_XML_Double extends WPSEO_Option_XML {
-	public function get_defaults() {
-		return $this->defaults;
-	}
-}
-
 
 /**
  * Class Test_WPSEO_Author_Sitemap_Provider
@@ -24,7 +17,11 @@ class Test_WPSEO_Author_Sitemap_Provider extends WPSEO_UnitTestCase {
 	 * Set up our double class
 	 */
 	public static function setUpBeforeClass() {
-		self::$class_instance = new WPSEO_Author_Sitemap_Provider;
+		parent::setUpBeforeClass();
+
+		require_once WPSEO_TESTS_PATH . 'doubles/wpseo-option-xml-double.php';
+
+		self::$class_instance = new WPSEO_Author_Sitemap_Provider();
 	}
 
 	/**
@@ -49,10 +46,11 @@ class Test_WPSEO_Author_Sitemap_Provider extends WPSEO_UnitTestCase {
 	 * @return stdClass
 	 */
 	public function get_user() {
-		static $userID = 1;
+		static $user_id = 1;
+
 		$user        = new stdClass();
 		$user->roles = array( 'administrator' );
-		$user->ID    = $userID ++;
+		$user->ID    = $user_id++;
 
 		return $user;
 	}
@@ -109,24 +107,6 @@ class Test_WPSEO_Author_Sitemap_Provider extends WPSEO_UnitTestCase {
 
 		// User should be removed.
 		$this->assertEmpty( $sitemap_links );
-	}
-
-	/**
-	 * Test if a user is -not- excluded from the sitemap when there are posts
-	 */
-	public function test_author_not_exclused_from_sitemap_by_zero_posts() {
-		$user = $this->get_user();
-
-		// Don't allow no posts.
-		add_filter( 'pre_option_wpseo_xml', array( $this, 'filter_exclude_author_by_no_posts' ) );
-
-		// Make the user -have- posts.
-		add_filter( 'get_usernumposts', array( $this, 'filter_user_has_posts' ) );
-
-		$result = self::$class_instance->user_sitemap_remove_excluded_authors( array( $user ) );
-
-		// User should not be removed.
-		$this->assertEquals( $result, array( $user ) );
 	}
 
 	/**

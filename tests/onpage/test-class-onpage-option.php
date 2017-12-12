@@ -1,8 +1,11 @@
 <?php
 /**
- * @package WPSEO\Unittests
+ * @package WPSEO\Tests\OnPage
  */
 
+/**
+ * Unit Test Class.
+ */
 class WPSEO_OnPage_Option_Test extends WPSEO_UnitTestCase {
 
 	/**
@@ -54,7 +57,7 @@ class WPSEO_OnPage_Option_Test extends WPSEO_UnitTestCase {
 	 * WPSEO_OnPage_Option::can_fetch
 	 */
 	public function test_cannot_fetch() {
-		$this->class_instance->set_last_fetch( strtotime("-5 seconds") );
+		$this->class_instance->set_last_fetch( strtotime( '-5 seconds' ) );
 		$this->assertFalse( $this->class_instance->should_be_fetched() );
 	}
 
@@ -64,7 +67,7 @@ class WPSEO_OnPage_Option_Test extends WPSEO_UnitTestCase {
 	 * WPSEO_OnPage_Option::can_fetch
 	 */
 	public function test_cannot_fetch_two_hours_ago() {
-		$this->class_instance->set_last_fetch( strtotime("-2 hours") );
+		$this->class_instance->set_last_fetch( strtotime( '-2 hours' ) );
 		$this->assertTrue( $this->class_instance->should_be_fetched() );
 	}
 }
